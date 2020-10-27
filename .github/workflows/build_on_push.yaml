@@ -27,8 +27,8 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
       - name: Push to GitHub Container Registry
-        working-directory: ./docker
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: ghcr.io/dr666m1/qiita_starwars:${{ steps.prep.outputs.tag }}
+        working-directory: ./docker
