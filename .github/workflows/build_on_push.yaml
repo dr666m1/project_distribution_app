@@ -30,5 +30,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ghcr.io/dr666m1/qiita_starwars:${{ steps.prep.outputs.tag }}
-        working-directory: ./docker
+          context: ./docker
+          tags: ghcr.io/dr666m1/distribution_app:${{ steps.prep.outputs.tag }}
