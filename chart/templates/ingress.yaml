@@ -14,5 +14,5 @@ spec:
         pathType: Prefix # any path under "/"
         backend:
           serviceName: distribution
-          servicePort: 8051
+          servicePort: 8501
 
