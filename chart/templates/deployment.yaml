@@ -33,7 +33,6 @@ spec:
               port: 8501
             initialDelaySeconds: 60
             periodSeconds: 300
-          redinessProbe:
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
