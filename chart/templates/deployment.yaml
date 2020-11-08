@@ -2,10 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: distribution
+  namespace: distribution
   labels:
     app: distribution
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: distribution
@@ -19,3 +20,28 @@ spec:
           image: ghcr.io/dr666m1/distribution_app:latest
           ports:
           - containerPort: 8501
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "300Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              path: / # /healthz is often used
+              port: 8501
+            initialDelaySeconds: 60
+            periodSeconds: 300
+          redinessProbe:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+              - matchExpressions:
+                - key: app
+                  operator: In
+                  values: ["distribution"]
+              topologyKey: kuernetes.io/hostname

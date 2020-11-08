@@ -1,0 +1,16 @@
+# https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-constraint-namespace/
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: distribution-limitrange
+  namespace: distribution
+spec:
+  limits:
+  - default:
+      cpu: "250m"
+      memory: "300Mi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "100Mi"
+    type: Container
+
