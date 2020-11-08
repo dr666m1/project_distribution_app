@@ -18,6 +18,7 @@ spec:
       containers:
         - name: distribution
           image: ghcr.io/dr666m1/distribution_app:latest
+          imagePullPolicy: Always # not recommended
           ports:
           - containerPort: 8501
           resources:

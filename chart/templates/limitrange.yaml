@@ -1,4 +1,3 @@
-# https://kubernetes.io/docs/tasks/administer-cluster/manage-resources/memory-constraint-namespace/
 apiVersion: v1
 kind: LimitRange
 metadata:
@@ -6,10 +5,10 @@ metadata:
   namespace: distribution
 spec:
   limits:
-  - default:
+  - default: # you can override by containers.resouces.limits
       cpu: "250m"
       memory: "300Mi"
-    defaultRequest:
+    defaultRequest: # you can override by containers.resouces.requests
       cpu: "100m"
       memory: "100Mi"
     type: Container

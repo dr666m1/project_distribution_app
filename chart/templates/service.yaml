@@ -12,4 +12,4 @@ spec:
     targetPort: 8501
   selector:
     app: distribution
-  type: NodePort
+  type: ClusterIP
