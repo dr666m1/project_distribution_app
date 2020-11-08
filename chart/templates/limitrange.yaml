@@ -2,7 +2,8 @@ apiVersion: v1
 kind: LimitRange
 metadata:
   name: distribution-limitrange
-  namespace: distribution
+  label:
+    app: distribution
 spec:
   limits:
   - default: # you can override by containers.resouces.limits

@@ -2,7 +2,8 @@ apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: distribution
-  namespace: distribution
+  label:
+    app: distribution
 spec:
   hard:
     pods: 5
