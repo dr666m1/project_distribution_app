@@ -17,4 +17,4 @@ USER $UID
 
 RUN pip install --no-cache-dir --user -r ./requirements.txt
 
-ENTRYPOINT ["streamlit", "run", "entrypoint.sh"]
+ENTRYPOINT ["streamlit", "run", "entrypoint.py"]

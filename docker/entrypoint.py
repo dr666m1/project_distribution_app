@@ -10,13 +10,17 @@ st.markdown("""# Distribution Sandbox""")
 n_choice = 2
 
 # sidebar
-method = st.sidebar.selectbox("method", [
-    "pdf (probability density function)",
-    "cdf (cumulative density function)",
-])
-x_min = st.sidebar.number_input("x_min", value=-3.0, step=0.5)
-x_max = st.sidebar.number_input("x_max", value=+3.0, step=0.5)
-distributions = {x[0]: x[1] for x in inspect.getmembers(stats, utils.is_continuous)}
+c_or_d = st.sidebar.selectbox("continuous or discrete", ["continuous","discrete",])
+is_continuous = True if c_or_d == "continuous" else False
+
+method = st.sidebar.selectbox("method", ["pdf (or pmf)", "cdf",])
+is_pdf = True if method == "pdf (or pmf)" else False
+
+x_min = st.sidebar.number_input("x_min", value=-10.0, step=1.0)
+x_max = st.sidebar.number_input("x_max", value= 10.0, step=1.0)
+
+with app.using_config({"is_continuous": is_continuous}):
+    distributions = {x[0]: x[1] for x in inspect.getmembers(stats, app.is_distribution)}
 
 choices = []
 args = []
@@ -29,8 +33,8 @@ for i in range(n_choice):
     args.append([float(x) for x in arg_text.split(",")] if arg_text else [])
 
 
-# graph
-if not any(choices):
+# help
+with st.beta_expander(f"need some help?"):
     st.markdown("""
         ### usage
         choose probability distributions to plot and pass arguments.  
@@ -51,43 +55,41 @@ if not any(choices):
             Cumulative distribution function.)
         ```
     """)
+
+# graph
 st.markdown(f"""## graph""")
 dfs = []
 
-for i in range(n_choice):
-    if choices[i]:
-        x_value = np.linspace(x_min, x_max, 1000)
-        try:
-            if method == "pdf (probability density function)":
-                y_value = [distributions[choices[i]].pdf(*a) for a in [[x]+args[i] for x in x_value]]
-            else:
-                y_value = [distributions[choices[i]].cdf(*a) for a in [[x]+args[i] for x in x_value]]
+if not any(choices):
+    st.markdown(f"""**no probability distribution is selected!!**""")
 
-            dfs.append(pd.DataFrame({
-                "choice": f"{i}: {choices[i]}",
-                "x": x_value,
-                "y": y_value,
-            }))
+with app.using_config({"is_continuous": is_continuous, "is_pdf": is_pdf}):
+    for i in range(n_choice):
+        if not choices[i]:
+            break
+        try:
+            dfs.append(app.generate_df(
+                distributions[choices[i]],
+                args[i],
+                f"{i}: "+choices[i],
+                x_min,
+                x_max,
+            ))
         except TypeError as e:
             st.markdown(f"""
                 maybe you passed invalid args as `args {i}`!  
                 see the docstring below and check the args of {method}.
             """)
-            break
-
-if dfs:
-    df = pd.concat(dfs, ignore_index=True).replace([np.inf, -np.inf, 0], np.nan).dropna()
-    chart = alt.Chart(df).mark_line().encode(
-        x="x",
-        y="y",
-        color="choice"
-    ).interactive()
-    st.altair_chart(chart, use_container_width=True)
+    if dfs:
+        df = pd.concat(dfs, ignore_index=True)
+        app.plot_chart(df)
 
 # doc
 st.markdown(f"""## docstrings""")
+if not any(choices):
+    st.markdown(f"""**no probability distribution is selected!!**""")
+
 for c in set(choices):
-    if c is not None:
+    if c:
         with st.beta_expander(f"docstring of {c}"):
             st.write(distributions[c].__doc__)
-issubclass(type(stats.multivariate_normal), stats.rv_continuous)
