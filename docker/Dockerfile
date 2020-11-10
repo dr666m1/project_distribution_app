@@ -6,19 +6,18 @@ ENV UID="5000"
 ENV GID="5000"
 ENV USER="app"
 
-COPY ./requirements.txt .
+COPY . .
 
 RUN addgroup --gid $GID app && \
     adduser --quiet app --uid $UID --gid $GID --home /home/$USER
 
 USER $UID
 
-RUN pip install --no-cache-dir --user -r ./requirements.txt
+RUN pip install --no-cache-dir --user -r ./requirements.txt && \
+    mv ./app entrypoint.py /home/$USER
 
 WORKDIR /home/$USER
 
-COPY ./app entrypoint.py .
-
 ENV PATH=$PATH:/home/$USER/.local/bin
 
-ENTRYPOINT ["streamlit", "hello"]
+ENTRYPOINT ["streamlit", "run", "entrypoint.sh"]
