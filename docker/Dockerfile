@@ -15,10 +15,11 @@ ENV PATH=$PATH:/home/$USER/.local/bin
 
 USER $UID
 
-RUN pip install --no-cache-dir --user -r ./requirements.txt && \
-    mv ./app entrypoint.py /home/$USER
+RUN pip install --no-cache-dir --user -r ./requirements.txt
 
 WORKDIR /home/$USER
 
+COPY ./app/ .
+COPY ./entrypoint.py .
 
 ENTRYPOINT ["streamlit", "run", "entrypoint.sh"]
