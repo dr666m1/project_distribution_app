@@ -11,6 +11,8 @@ COPY . .
 RUN addgroup --gid $GID app && \
     adduser --quiet app --uid $UID --gid $GID --home /home/$USER
 
+ENV PATH=$PATH:/home/$USER/.local/bin
+
 USER $UID
 
 RUN pip install --no-cache-dir --user -r ./requirements.txt && \
@@ -18,6 +20,5 @@ RUN pip install --no-cache-dir --user -r ./requirements.txt && \
 
 WORKDIR /home/$USER
 
-ENV PATH=$PATH:/home/$USER/.local/bin
 
 ENTRYPOINT ["streamlit", "run", "entrypoint.sh"]
