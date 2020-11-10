@@ -4,7 +4,7 @@ import pandas as pd
 import scipy.stats as stats
 import inspect
 import altair as alt
-import utils
+import app
 
 st.markdown("""# Distribution Sandbox""")
 n_choice = 2
