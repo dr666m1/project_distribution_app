@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: distribution
+  name: distribution-resourcequota
   labels:
     app: distribution
 spec:

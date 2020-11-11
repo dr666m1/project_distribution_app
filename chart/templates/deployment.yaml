@@ -18,6 +18,11 @@ spec:
         - name: distribution
           image: ghcr.io/dr666m1/distribution_app:latest
           imagePullPolicy: Always # not recommended
+          securityContext:
+            runAsNoneRoot: true
+            capabilities:
+              drop: ["all"]
+            allowPrivilegeEscalation: false
           ports:
           - containerPort: 8501
           resources:
