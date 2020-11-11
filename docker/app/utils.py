@@ -3,6 +3,7 @@ import scipy.stats
 import pandas as pd
 import numpy as np
 import altair as alt
+from altair import expr, datum
 import streamlit as st
 
 class ApplicationError(Exception):
@@ -72,11 +73,32 @@ class DFGenerator:
 
 def generate_chart(df):
     if Config.is_continuous:
-        chart = alt.Chart(df).mark_line().encode(
+        line = alt.Chart(df).mark_line().encode(
             x="x",
             y="y",
             color="label"
-        ).interactive()
+        )
+        nearest = alt.selection(
+            type="single",
+            nearest=True,
+            on="mouseover",
+            encodings=["x"],
+            empty="none",
+        )
+        selectors = alt.Chart(df).mark_point().encode(
+            x='x',
+            opacity=alt.value(0),
+        ).add_selection(nearest)
+        rules = alt.Chart(df).mark_rule(color='gray').encode(
+            x='x',
+        ).transform_filter(nearest)
+        points = line.mark_point().encode(
+            opacity=alt.condition(nearest, alt.value(1), alt.value(0))
+        )
+        text = line.mark_text(align='left', dx=5, dy=-5).encode(
+            text=alt.condition(nearest, 'y_:Q', alt.value(' '))
+        ).transform_calculate(y_=expr.round(datum.y*100)/100)
+        chart = alt.layer(line, selectors, rules, points, text)
     else:
         chart = alt.Chart(df).mark_bar(opacity=0.6).encode(
             x="x:O",
