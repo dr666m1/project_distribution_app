@@ -19,7 +19,7 @@ spec:
           image: ghcr.io/dr666m1/distribution_app:latest
           imagePullPolicy: Always # not recommended
           securityContext:
-            runAsNoneRoot: true
+            runAsNonRoot: true
             capabilities:
               drop: ["all"]
             allowPrivilegeEscalation: false
