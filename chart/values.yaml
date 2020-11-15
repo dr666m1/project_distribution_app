@@ -1,4 +1,4 @@
-name: probability_distribution_app
+name: probability-distribution-app
 replicas: 2
 docker:
   tag: latest
