@@ -1,2 +1,6 @@
 name: probability_distribution_app
 replicas: 2
+docker:
+  tag: latest
+  env:
+    n_choice: 1
