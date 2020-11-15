@@ -1,4 +1,4 @@
-name: probability_distribution_app
+name: probability-distribution-app
 sources:
 - https://github.com/dr666m1/project_distribution_app
-version: CHART_VERSION
+version: 0.0
