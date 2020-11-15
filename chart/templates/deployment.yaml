@@ -1,23 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: distribution
+  name: {{ .Values.name }}-deploy
   labels:
-    app: distribution
+    app: {{ .Values.name }}
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: distribution
+      app: {{ .Values.name }}
   template:
     metadata:
       labels:
-        app: distribution
+        app: {{ .Values.name }}
     spec:
       containers:
-        - name: distribution
-          image: ghcr.io/dr666m1/distribution_app:latest
+        - name: {{ .Values.name }}
+          image: ghcr.io/dr666m1/probability_distribution_app:{{ .Values.docker.tag }}
           imagePullPolicy: Always # not recommended
+          env:
+            - name: N_CHOICE
+              value: {{ .Values.docker.env.n_choice | quote }}
+          securityContext:
+            runAsNonRoot: true
+            capabilities:
+              drop: ["all"]
+            allowPrivilegeEscalation: false
           ports:
           - containerPort: 8501
           resources:
@@ -42,5 +50,5 @@ spec:
                 matchExpressions:
                 - key: app
                   operator: In
-                  values: ["distribution"]
+                  values: [{{ .Values.name | quote }}]
               topologyKey: kuernetes.io/hostname

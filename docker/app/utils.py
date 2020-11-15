@@ -3,18 +3,17 @@ import scipy.stats
 import pandas as pd
 import numpy as np
 import altair as alt
+from altair import expr, datum
 import streamlit as st
 
-def is_distribution(x):
-    parent = scipy.stats.rv_continuous if Config.is_continuous else scipy.stats.rv_discrete
-    try:
-        return issubclass(type(x), parent)
-    except TypeError as e:
-        return False
+class ApplicationError(Exception):
+    """exceptions raised by this application"""
+
 
 class Config:
     is_continuous = True
     is_pdf = True
+
 
 @contextlib.contextmanager
 def using_config(config_dict):
@@ -29,42 +28,105 @@ def using_config(config_dict):
             setattr(Config, k, v)
 
 
-def generate_df(distribution, args, label, x_min=-3, x_max=3):
-    x_value = _generate_x(x_min, x_max)
-    y_value = _generate_y(distribution, x_value, args)
-    df = pd.DataFrame({
-        "label": label,
-        "x": x_value,
-        "y": y_value,
-    })
-    df["y"].replace([np.inf, -np.inf, 0], np.nan, inplace=True)
-    return df.dropna()
-
-def _generate_x(x_min, x_max):
-    if Config.is_continuous:
-        return np.linspace(x_min, x_max, 1000)
-    else:
-        return np.arange(int(x_min), int(x_max)+1)
-
-def _generate_y(distribution, x_value, args):
+def is_distribution(x):
+    parent = scipy.stats.rv_continuous if Config.is_continuous else scipy.stats.rv_discrete
     try:
-        method = distribution.pdf if Config.is_pdf else distribution.cdf
-    except AttributeError as e:
-        method = distribution.pmf
-    return [method(*a) for a in [[x]+args for x in x_value]]
+        return issubclass(type(x), parent)
+    except TypeError as e:
+        return False
 
-def plot_chart(df):
+
+class DFGenerator:
+    def __init__(self, distribution, label, x_min, x_max, args):
+        self.distribution = distribution
+        self.label = label
+        self.x_min = x_min
+        self.x_max = x_max
+        self.args = args
+
+    def _pdf_or_pmf(self):
+        if Config.is_continuous:
+            return self.distribution.pdf
+        else:
+            return self.distribution.pmf
+
+    def _generate_x(self):
+        if Config.is_continuous:
+            return np.linspace(self.x_min, self.x_max, 1000)
+        else:
+            return np.arange(int(self.x_min), int(self.x_max)+1)
+
+    def _generate_y(self, x_value):
+        method = self._pdf_or_pmf() if Config.is_pdf else self.distribution.cdf
+        return [method(*a) for a in [[x]+self.args for x in x_value]]
+
+    def generate_df(self):
+        x_value = self._generate_x()
+        y_value = self._generate_y(x_value)
+        df = pd.DataFrame({"label": self.label, "x": x_value, "y": y_value})
+        df["y"].replace([np.inf, -np.inf, 0], np.nan, inplace=True)
+        ret = df.dropna()
+        if ret.shape[0] == 0:
+            raise ApplicationError
+        return ret
+
+
+def generate_chart(df):
     if Config.is_continuous:
-        chart = alt.Chart(df).mark_line().encode(
+        base = alt.Chart(df).mark_line().encode(
             x="x",
             y="y",
             color="label"
-        ).interactive()
+        )
     else:
-        chart = alt.Chart(df).mark_bar(opacity=0.6).encode(
+        base = alt.Chart(df).mark_bar(opacity=0.2).encode(
             x="x:O",
             y=alt.Y('y', stack=None),
             color="label",
-        ).interactive()
-    st.altair_chart(chart, use_container_width=True)
+        )
+    nearest = alt.selection(
+        type="single",
+        nearest=True,
+        on="mouseover",
+        encodings=["x"],
+        empty="none",
+    )
+    selectors = alt.Chart(df).mark_point().encode(
+        x=f'x:{"Q" if Config.is_continuous else "O"}',
+        opacity=alt.value(0),
+    ).add_selection(nearest)
+    rules = alt.Chart(df).mark_rule(color='gray').encode(
+        x=f'x:{"Q" if Config.is_continuous else "O"}',
+    ).transform_filter(nearest)
+    points = base.mark_point().encode(
+        opacity=alt.condition(nearest, alt.value(1), alt.value(0))
+    )
+    text = base.mark_text(align='left', dx=5, dy=-5).encode(
+        text=alt.condition(nearest, 'xy:N', alt.value(' '))
+    ).transform_calculate(xy=expr.join([
+        "(", expr.toString(expr.round(datum.x*100)/100), ', ', expr.toString(expr.round(datum.y*100)/100), ")"
+    ], ''))
+    chart = alt.layer(base, selectors, rules, points, text)
+    return chart
 
+
+help_message = f"""
+    ### usage
+    choose probability distributions to plot and pass arguments.  
+    you can read the docstring to check valid arguments.  
+    ### example
+    according to the docstring, you can pass three arguments to
+    *scipy.stats.norm.pdf()*.  
+    since `x`(or `k`) is automatically passed,
+    you can pass other arguments `loc`, `scale`.  
+    if you want to plot *N(0, 1^2)*,
+    fill `args n` with `0,1` (or leave it blank to use default value).
+    ```
+    Method
+    ---
+    pdf(x, loc=0, scale=1)
+        Probability density function.)
+    cdf(x, loc=0, scale=1)
+        Cumulative distribution function.)
+    ```
+"""
