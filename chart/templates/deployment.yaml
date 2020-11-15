@@ -20,7 +20,7 @@ spec:
           imagePullPolicy: Always # not recommended
           env:
             - name: N_CHOICE
-              value: {{ .Values.docker.env.n_choice }}
+              value: {{ .Values.docker.env.n_choice | quote }}
           securityContext:
             runAsNonRoot: true
             capabilities:
