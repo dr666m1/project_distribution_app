@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ResourceQuota
 metadata:
-  name: distribution-resourcequota
+  name: {{ .Values.name }}-quota
   labels:
-    app: distribution
+    app: {{ .Values.name }}
 spec:
   hard:
     pods: 5

@@ -1,11 +1,11 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: distribution-pdb
+  name: {{ .Values.name }}-pdb
   labels:
-    app: distribution
+    app: {{ .Values.name }}
 spec:
   maxUnavailable: 1
   selector:
     matchLabels:
-      app: distribution
+      app: {{ .Values.name }}

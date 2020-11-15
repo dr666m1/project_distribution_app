@@ -1,9 +1,9 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: distribution
+  name: {{ .Values.name }}-ing
   labels:
-    app: distribution
+    app: {{ .Values.name }}
   annotations:
     ingress.kubernetes.io/ssl-redirect: "false"
 spec:
@@ -13,6 +13,6 @@ spec:
       - path: /
         pathType: Prefix # any path under "/"
         backend:
-          serviceName: distribution
+          serviceName: {{ .Values.name }}-svc
           servicePort: 8501
 
