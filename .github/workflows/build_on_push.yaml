@@ -1,5 +1,7 @@
 name: Publish Docker image
-on: push
+on:
+  push:
+    tags: "*-dev"
 jobs:
   main:
     name: Push Docker image to Github Container Registry
@@ -10,6 +12,7 @@ jobs:
         run: |
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             TAG=${GITHUB_REF#refs/tags/}
+            TAG=${TAG%-tag}
           else
             TAG="latest"
           fi
@@ -33,3 +36,4 @@ jobs:
           context: ./docker
           file: ./docker/Dockerfile
           tags: ghcr.io/dr666m1/probability_distribution_app:${{ steps.prep.outputs.tag }}
+

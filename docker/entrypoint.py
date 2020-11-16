@@ -6,7 +6,7 @@ import scipy.stats
 import streamlit as st
 
 st.markdown("""# Probability Distribution Sandbox""")
-n_choice = int(os.environ.get("N_CHOICE", 2))
+n_choice = int(os.environ.get("N_CHOICE", 1))
 
 ##### sidebar #####
 c_or_d = st.sidebar.selectbox("continuous or discrete", ["continuous","discrete",])

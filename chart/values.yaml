@@ -3,4 +3,4 @@ replicas: 2
 docker:
   tag: latest
   env:
-    n_choice: 1
+    n_choice: 2
