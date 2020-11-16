@@ -1,6 +1,8 @@
 # introduction
 you can plot most of probability distributions in [scipy](https://docs.scipy.org/doc/scipy/reference/stats.html).
 
+<img src="https://user-images.githubusercontent.com/26474260/99268739-e47c6700-2868-11eb-81f0-12f0a89e6db8.png">
+
 # usage
 ## web app
 visit [here](http://140.238.45.16/)
