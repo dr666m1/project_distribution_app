@@ -33,3 +33,4 @@ jobs:
           context: ./docker
           file: ./docker/Dockerfile
           tags: ghcr.io/dr666m1/probability_distribution_app:${{ steps.prep.outputs.tag }}
+
