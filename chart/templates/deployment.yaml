@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.name }}
-          image: ghcr.io/dr666m1/probability_distribution_app:{{ .Values.docker.tag }}
+          image: {{ .Values.docker.image }}:{{ .Values.docker.tag }}
           imagePullPolicy: Always # not recommended
           env:
             - name: N_CHOICE

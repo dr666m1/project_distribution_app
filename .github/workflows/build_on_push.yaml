@@ -1,7 +1,5 @@
 name: Publish Docker image
-on:
-  push:
-    tags: "*-dev"
+on: push:
 jobs:
   main:
     name: Push Docker image to Github Container Registry
@@ -12,7 +10,6 @@ jobs:
         run: |
           if [[ $GITHUB_REF == refs/tags/* ]]; then
             TAG=${GITHUB_REF#refs/tags/}
-            TAG=${TAG%-tag}
           else
             TAG="latest"
           fi
