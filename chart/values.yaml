@@ -2,6 +2,6 @@ name: probability-distribution-app
 replicas: 2
 docker:
   tag: latest
-  image: ghcr.io/dr666m1/probability-distribution-app
+  image: ghcr.io/dr666m1/probability_distribution_app
   env:
     n_choice: 2
